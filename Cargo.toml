@@ -1,0 +1,16 @@
+[package]
+name = "algorithms-rust"
+description = "Algorithms in Rust"
+version = "0.1.0"
+edition = "2021"
+
+# --------------------------------------------------------------------------------------------------
+
+[dependencies]
+rand = "0.8"
+
+[profile.release]
+debug = 1
+
+[dev-dependencies]
+tempfile = "3"
