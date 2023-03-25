@@ -12,8 +12,10 @@ learning straright away, regardless of whether the algorithms are implemented in
 something else. Programming languages go in and out of fashion, but algorithms and their beauty are 
 long lasting.
 
-I have been greatly inspired by the teachings of Professor Sedgewick, in particular his MOOCs on 
-algorithms. As I continue to learn and refresh my knowledge on the material I have learnt, I found 
-it useful to go over the algorithms again, but using Rust instead as the implementation language.
+I have been greatly inspired by the teachings of 
+[Professor Sedgewick](https://en.wikipedia.org/wiki/Robert_Sedgewick_(computer_scientist)), in 
+particular his MOOCs on algorithms. As I continue to learn and refresh my knowledge on the material 
+I have learnt, I found it useful to go over the algorithms again, but using Rust instead as the 
+implementation language.
 
 Rust offers a fresh perspective on algorithm implementations that are unique.
