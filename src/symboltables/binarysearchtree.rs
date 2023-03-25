@@ -1,6 +1,7 @@
 //! Binary Search Tree
 //!
 //! A symbol table implementation using binary search trees.
+//!
 use std::{cmp::Ordering, fmt::Debug};
 
 use super::{item::Item, symboltable::SymbolTable};
@@ -90,7 +91,7 @@ where
     I: Item + Default + Clone + Copy + PartialEq + Debug,
 {
     fn count(&self) -> usize {
-        todo!()
+        self.count
     }
 
     fn search(&self, key: I::Key) -> I {
@@ -140,6 +141,8 @@ mod test {
         bst.insert(i2);
         bst.insert(i3);
         bst.insert(i4);
+
+        assert_eq!(bst.count(), 4);
 
         let expected_result: Vec<&dyn Item<Key = usize>> = vec![&i4, &i2, &i1, &i3];
         let result = bst.show();

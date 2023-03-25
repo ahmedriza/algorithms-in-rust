@@ -19,4 +19,4 @@ particular his MOOCs on algorithms. As I continue to learn and refresh my knowle
 I have learnt, I found it useful to go over the algorithms again, but using Rust instead as the 
 implementation language.
 
-Rust offers a fresh perspective on algorithm implementations that are unique.
+Rust offers a fresh and unique perspective on algorithm implementations.
