@@ -13,7 +13,8 @@ something else. Programming languages go in and out of fashion, but algorithms a
 long lasting.
 
 I have been greatly inspired by the teachings of 
-[Professor Sedgewick](https://en.wikipedia.org/wiki/Robert_Sedgewick_(computer_scientist)), in 
+[Professor Sedgewick](https://en.wikipedia.org/wiki/Robert_Sedgewick_(computer_scientist))
+(a student of [Donald Knuth](https://en.wikipedia.org/wiki/Donald_Knuth)), in 
 particular his MOOCs on algorithms. As I continue to learn and refresh my knowledge on the material 
 I have learnt, I found it useful to go over the algorithms again, but using Rust instead as the 
 implementation language.
