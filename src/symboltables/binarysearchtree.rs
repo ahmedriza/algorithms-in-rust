@@ -102,15 +102,7 @@ where
         self.count += 1;
     }
 
-    //     9
-    //    / \
-    //   8   11
-    //  / \
-    // 7
     fn remove(&mut self, _item: I) {
-        // find the item in the tree
-        // we will also need to know the parent node of the node we are removing
-        self.count -= 1;
         todo!()
     }
 

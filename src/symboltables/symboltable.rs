@@ -2,6 +2,9 @@ use std::{fmt::Debug, rc::Rc};
 
 use super::item::Item;
 
+/// Symbol Table
+///
+/// The interface of a symbol table
 pub trait SymbolTable<I: Item + PartialEq, K> {
     /// Return the item count
     fn count(&self) -> usize;
@@ -24,7 +27,7 @@ pub trait SymbolTable<I: Item + PartialEq, K> {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Key index symbol table.
+/// Key indexed symbol table.
 ///
 /// Key values are positive integers less than a sentinel value `m` and uses them as indices into
 /// an array.
@@ -96,6 +99,8 @@ where
 
 // -------------------------------------------------------------------------------------------------
 
+/// Array Symbol Table
+///
 /// Array based symbol table where the items are kept in the order of the keys
 pub struct ArraySymbolTable<I: Item> {
     items: Vec<I>,
@@ -199,6 +204,8 @@ impl<I: Item> Node<I> {
     }
 }
 
+/// Lined Symbol Table
+///
 /// Linked list based (un-ordered) symbol table
 #[derive(Default)]
 pub struct LinkedSymbolTable<I: Item> {

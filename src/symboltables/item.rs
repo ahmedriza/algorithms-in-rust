@@ -17,8 +17,7 @@ pub trait Item: Debug {
 
 // This allows us to compare vectors of type Vec<&dyn Item<Key>> for an Key that has an `Ord`
 // implementation.
-// https://stackoverflow.com/questions/25339603/how-to-test-for-equality-between-trait-objects
-//
+// 
 // Items are equal if their keys are equal. Due to the requirement on Item::Key to be `Ord`, we
 // also need the type `T` to be `Ord`.
 impl<T: Ord> PartialEq for dyn Item<Key = T> + '_ {
