@@ -12,6 +12,15 @@ struct Node<I: Item> {
     right: Link<I>,
 }
 
+impl<I> PartialEq for Node<I>
+where
+    I: Item + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.item == other.item && self.left == other.left && self.right == other.right
+    }
+}
+
 impl<I: Item> Node<I> {
     pub fn new(item: I) -> Self {
         Self {
@@ -134,7 +143,17 @@ where
     ///            / \   
     ///               C
     /// ```
-    fn rotate_left(link: Link<I>) {}
+    fn rotate_left(root: Link<I>) -> Link<I> {
+        if let Some(mut a) = root {
+            let e = a.right;
+            if let Some(mut e_node) = e {
+                a.right = e_node.left;
+                e_node.left = Some(a);
+                return Some(e_node);
+            }
+        }
+        None
+    }
 }
 
 impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
@@ -173,6 +192,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::symboltables::{
+        binarysearchtree::Node,
         item::{DoubleItem, Item},
         symboltable::SymbolTable,
     };
@@ -210,32 +230,39 @@ mod test {
     fn test_rotate_left() {
         let mut bst = BinarySearchTree::<DoubleItem>::default();
 
-        let i1 = DoubleItem::with_key(11);
-        let i2 = DoubleItem::with_key(15);
-        let i3 = DoubleItem::with_key(8);
-        let i4 = DoubleItem::with_key(9);
-        let i5 = DoubleItem::with_key(7);
+        let i_7 = DoubleItem::with_key(7);
+        let i_8 = DoubleItem::with_key(8);
+        let i_9 = DoubleItem::with_key(9);
+        let i_11 = DoubleItem::with_key(11);
+        let i_15 = DoubleItem::with_key(15);
 
         //         11
         //        / \
         //       8   15
         //      / \
         //     7   9
-        bst.insert(i1);
-        bst.insert(i2);
-        bst.insert(i3);
-        bst.insert(i4);
-        bst.insert(i5);
+        bst.insert(i_11);
+        bst.insert(i_15);
+        bst.insert(i_8);
+        bst.insert(i_9);
+        bst.insert(i_7);
 
-        println!("{:#?}", bst.head);
 
+        let h = BinarySearchTree::rotate_right(bst.head);        
         //        8
         //       / \
         //      7   11
         //         /  \
         //        9    15
+        assert_eq!(h.as_ref().unwrap().item, i_8);
 
-        let h = BinarySearchTree::rotate_right(bst.head);
-        println!("{:#?}", h);
+        let left_subtree = Box::new(Node::new(i_7));
+
+        let mut right_subtree = Box::new(Node::new(i_11));
+        right_subtree.left = Some(Box::new(Node::new(i_9)));
+        right_subtree.right = Some(Box::new(Node::new(i_15)));
+
+        assert_eq!(h.as_ref().unwrap().left, Some(left_subtree));
+        assert_eq!(h.as_ref().unwrap().right, Some(right_subtree));
     }
 }
