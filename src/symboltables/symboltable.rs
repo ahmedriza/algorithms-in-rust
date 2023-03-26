@@ -1,9 +1,9 @@
+//! Symbol Table
+
 use std::{fmt::Debug, rc::Rc};
 
 use super::item::Item;
 
-/// Symbol Table
-///
 /// The interface of a symbol table
 pub trait SymbolTable<I: Item + PartialEq, K> {
     /// Return the item count
@@ -193,7 +193,7 @@ where
 
 type Link<I> = Option<Rc<Node<I>>>;
 
-pub struct Node<I: Item> {
+struct Node<I: Item> {
     item: I,
     next: Link<I>,
 }
@@ -204,7 +204,7 @@ impl<I: Item> Node<I> {
     }
 }
 
-/// Lined Symbol Table
+/// Linked Symbol Table
 ///
 /// Linked list based (un-ordered) symbol table
 #[derive(Default)]
@@ -225,7 +225,7 @@ where
     }
 
     // recursive implementation of search.
-    pub fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
+    fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
         match link {
             Some(t) => {
                 if t.item.key() == key {

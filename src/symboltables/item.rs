@@ -1,8 +1,9 @@
+//! Items that can be stored in symbol tables
 use std::{any::Any, fmt::Debug};
 
 use rand::{thread_rng, Rng};
 
-/// An item that can be stored in a symbol table
+/// Interface of items that can be stored in a symbol table
 pub trait Item: Debug {
     type Key: Ord; // key has to be comparable
 

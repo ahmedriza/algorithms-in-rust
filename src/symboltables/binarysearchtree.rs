@@ -1,7 +1,4 @@
 //! Binary Search Tree
-//!
-//! A symbol table implementation using binary search trees.
-//!
 use std::{cmp::Ordering, fmt::Debug};
 
 use super::{item::Item, symboltable::SymbolTable};
@@ -9,7 +6,7 @@ use super::{item::Item, symboltable::SymbolTable};
 type Link<I> = Option<Box<Node<I>>>;
 
 #[derive(Debug)]
-pub struct Node<I: Item> {
+struct Node<I: Item> {
     item: I,
     left: Link<I>,
     right: Link<I>,
@@ -25,6 +22,7 @@ impl<I: Item> Node<I> {
     }
 }
 
+/// A symbol table implementation using binary search trees.
 #[derive(Default)]
 pub struct BinarySearchTree<I: Item> {
     head: Link<I>,
@@ -43,7 +41,7 @@ where
     }
 
     // Recursive implementation of insert
-    pub fn insert_r(link: &mut Link<I>, item: I) {
+    fn insert_r(link: &mut Link<I>, item: I) {
         match link {
             Some(node) => {
                 if item.key() < node.item.key() {
@@ -59,7 +57,7 @@ where
     }
 
     // Recursive implementation of search
-    pub fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
+    fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
         match link {
             Some(node) => match key.cmp(&node.item.key()) {
                 Ordering::Less => BinarySearchTree::search_r(&node.left, key),
@@ -70,7 +68,7 @@ where
         }
     }
 
-    pub fn show_r<'a>(
+    fn show_r<'a>(
         link: &'a Link<I>,
         acc: &mut Vec<&'a dyn Item<Key = I::Key>>,
     ) -> Vec<&'a dyn Item<Key = I::Key>> {
@@ -89,37 +87,54 @@ where
     /// For example, given the following tree where the root is at S:
     ///
     /// ```text
-    ///            S   
-    ///          /   \
-    ///         E     X
-    ///        / \   / \
+    ///           S   
+    ///          / \
+    ///         E   X
+    ///        / \    
     ///       C   R
     /// ```
     /// a right rotation will result in:
     /// ```text
     ///
-    ///             E
-    ///           /   \
-    ///          C     S
-    ///               / \
-    ///              R   X
+    ///            E
+    ///           / \
+    ///          C   S
+    ///             / \
+    ///            R   X
     ///
     /// ```
-    pub fn rotate_right(root: Link<I>) -> Link<I> {
+    fn rotate_right(root: Link<I>) -> Link<I> {
         if let Some(mut s) = root {
             let e = s.left;
             if let Some(mut e_node) = e {
                 s.left = e_node.right;
                 e_node.right = Some(s);
-                s = e_node;
-                return Some(s);
+                return Some(e_node);
             }
         }
         None
     }
 
-    // Left rotation.
-    pub fn rotate_left(link: Link<I>) {}
+    /// Left rotation. In a left rotation, the right child of the root becomes the new root.
+    /// For example, given the following tree where the root is at A:
+    ///
+    /// ```text
+    ///            A   
+    ///           / \
+    ///              E
+    ///             / \
+    ///            C   S
+    ///                 
+    /// ````
+    /// a left rotation will result in:
+    /// ```text
+    ///               E
+    ///              / \
+    ///             A   S
+    ///            / \   
+    ///               C
+    /// ```
+    fn rotate_left(link: Link<I>) {}
 }
 
 impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
