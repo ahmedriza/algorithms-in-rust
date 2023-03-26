@@ -10,7 +10,7 @@ pub trait SymbolTable<I: Item + PartialEq, K> {
     fn count(&self) -> usize;
 
     /// Find an item with the given key
-    fn search(&self, key: K) -> I;
+    fn search(&self, key: K) -> Option<&I>;
 
     /// Insert an item
     fn insert(&mut self, item: I);
@@ -60,8 +60,8 @@ where
         n
     }
 
-    fn search(&self, key: usize) -> I {
-        self.items[key]
+    fn search(&self, key: usize) -> Option<&I> {
+        Some(&self.items[key])
     }
 
     fn insert(&mut self, item: I) {
@@ -131,7 +131,7 @@ where
         self.count
     }
 
-    fn search(&self, key: I::Key) -> I {
+    fn search(&self, key: I::Key) -> Option<&I> {
         let mut k = 0;
         for i in 0..self.count {
             if self.items[i].key() >= key {
@@ -140,9 +140,9 @@ where
             k += 1;
         }
         if key == self.items[k].key() {
-            return self.items[k];
+            return Some(&self.items[k]);
         }
-        I::default()
+        None
     }
 
     // Keep the array in order when inserting a new item by moving larger items to make room,
@@ -225,16 +225,16 @@ where
     }
 
     // recursive implementation of search.
-    pub fn search_r(link: Link<I>, key: I::Key) -> I {
+    pub fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
         match link {
             Some(t) => {
                 if t.item.key() == key {
-                    t.item
+                    Some(&t.item)
                 } else {
-                    LinkedSymbolTable::search_r(t.next.clone(), key)
+                    LinkedSymbolTable::search_r(&t.next, key)
                 }
             }
-            None => I::default(),
+            None => None,
         }
     }
 }
@@ -247,8 +247,8 @@ where
         self.count
     }
 
-    fn search(&self, key: I::Key) -> I {
-        LinkedSymbolTable::search_r(self.head.clone(), key)
+    fn search(&self, key: I::Key) -> Option<&I> {
+        LinkedSymbolTable::search_r(&self.head, key)
     }
 
     fn insert(&mut self, item: I) {
@@ -302,9 +302,9 @@ mod test {
         st.insert(i3);
 
         // an item that exists
-        assert_eq!(st.search(15), DoubleItem::with_key(15));
+        assert_eq!(st.search(15), Some(&DoubleItem::with_key(15)));
         // non-existent item
-        assert_eq!(st.search(150), DoubleItem::default());
+        assert_eq!(st.search(150), None);
 
         assert_eq!(st.select(1), DoubleItem::with_key(15));
 
@@ -328,9 +328,9 @@ mod test {
         st.insert(i2);
         st.insert(i3);
 
-        assert_eq!(st.search(15), DoubleItem::with_key(15));
+        assert_eq!(st.search(15), Some(&DoubleItem::with_key(15)));
 
         // non-existent item
-        assert_eq!(st.search(150), DoubleItem::default());
+        assert_eq!(st.search(150), None);
     }
 }

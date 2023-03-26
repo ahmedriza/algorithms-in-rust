@@ -59,14 +59,14 @@ where
     }
 
     // Recursive implementation of search
-    pub fn search_r(link: &Link<I>, key: I::Key) -> I {
+    pub fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
         match link {
             Some(node) => match key.cmp(&node.item.key()) {
                 Ordering::Less => BinarySearchTree::search_r(&node.left, key),
-                Ordering::Equal => node.item,
+                Ordering::Equal => Some(&node.item),
                 Ordering::Greater => BinarySearchTree::search_r(&node.right, key),
             },
-            None => I::default(),
+            None => None,
         }
     }
 
@@ -105,8 +105,8 @@ where
     ///              R   X
     ///
     /// ```
-    pub fn rotate_right(link: Link<I>) -> Link<I> {
-        if let Some(mut s) = link {
+    pub fn rotate_right(root: Link<I>) -> Link<I> {
+        if let Some(mut s) = root {
             let e = s.left;
             if let Some(mut e_node) = e {
                 s.left = e_node.right;
@@ -130,7 +130,7 @@ where
         self.count
     }
 
-    fn search(&self, key: I::Key) -> I {
+    fn search(&self, key: I::Key) -> Option<&I> {
         BinarySearchTree::search_r(&self.head, key)
     }
 
@@ -184,11 +184,11 @@ mod test {
         let result = bst.show();
         assert_eq!(result, expected_result);
 
-        assert_eq!(bst.search(15), DoubleItem::with_key(15));
-        assert_eq!(bst.search(9), DoubleItem::with_key(9));
+        assert_eq!(bst.search(15), Some(&DoubleItem::with_key(15)));
+        assert_eq!(bst.search(9), Some(&DoubleItem::with_key(9)));
 
         // non-existent item
-        assert_eq!(bst.search(150), DoubleItem::default());
+        assert_eq!(bst.search(150), None);
     }
 
     #[test]
