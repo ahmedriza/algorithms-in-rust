@@ -84,6 +84,42 @@ where
         }
         acc.to_vec()
     }
+
+    /// Right rotation. In a right rotation, the left child of the root becomes the new root.
+    /// For example, given the following tree where the root is at S:
+    ///
+    /// ```text
+    ///            S   
+    ///          /   \
+    ///         E     X
+    ///        / \   / \
+    ///       C   R
+    /// ```
+    /// a right rotation will result in:
+    /// ```text
+    ///
+    ///             E
+    ///           /   \
+    ///          C     S
+    ///               / \
+    ///              R   X
+    ///
+    /// ```
+    pub fn rotate_right(link: Link<I>) -> Link<I> {
+        if let Some(mut s) = link {
+            let e = s.left;
+            if let Some(mut e_node) = e {
+                s.left = e_node.right;
+                e_node.right = Some(s);
+                s = e_node;
+                return Some(s);
+            }
+        }
+        None
+    }
+
+    // Left rotation.
+    pub fn rotate_left(link: Link<I>) {}
 }
 
 impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
@@ -153,5 +189,38 @@ mod test {
 
         // non-existent item
         assert_eq!(bst.search(150), DoubleItem::default());
+    }
+
+    #[test]
+    fn test_rotate_left() {
+        let mut bst = BinarySearchTree::<DoubleItem>::default();
+
+        let i1 = DoubleItem::with_key(11);
+        let i2 = DoubleItem::with_key(15);
+        let i3 = DoubleItem::with_key(8);
+        let i4 = DoubleItem::with_key(9);
+        let i5 = DoubleItem::with_key(7);
+
+        //         11
+        //        / \
+        //       8   15
+        //      / \
+        //     7   9
+        bst.insert(i1);
+        bst.insert(i2);
+        bst.insert(i3);
+        bst.insert(i4);
+        bst.insert(i5);
+
+        println!("{:#?}", bst.head);
+
+        //        8
+        //       / \
+        //      7   11
+        //         /  \
+        //        9    15
+
+        let h = BinarySearchTree::rotate_right(bst.head);
+        println!("{:#?}", h);
     }
 }
