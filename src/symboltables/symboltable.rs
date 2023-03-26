@@ -38,7 +38,7 @@ pub struct KeyIndexedSymbolTable<I: Item<Key = usize>> {
 
 impl<I> KeyIndexedSymbolTable<I>
 where
-    I: Item<Key = usize> + Default + Clone + Copy + PartialEq,
+    I: Item<Key = usize> + Default + Clone + PartialEq,
 {
     pub fn new(m: usize) -> Self {
         let items = vec![I::default(); m];
@@ -48,7 +48,7 @@ where
 
 impl<I> SymbolTable<I, usize> for KeyIndexedSymbolTable<I>
 where
-    I: Item<Key = usize> + Default + Clone + Copy + PartialEq,
+    I: Item<Key = usize> + Default + Clone + PartialEq,
 {
     fn count(&self) -> usize {
         let mut n = 0;
@@ -65,7 +65,7 @@ where
     }
 
     fn insert(&mut self, item: I) {
-        self.items[item.key()] = item;
+        self.items[item.key()] = item.clone();
     }
 
     fn remove(&mut self, item: I) {
@@ -77,7 +77,7 @@ where
         for i in 0..self.m {
             if !self.items[i].null() {
                 if k == 0 {
-                    return self.items[i];
+                    return self.items[i].clone();
                 }
                 k -= 1;
             }
@@ -109,7 +109,7 @@ pub struct ArraySymbolTable<I: Item> {
 
 impl<I> ArraySymbolTable<I>
 where
-    I: Item + Default + Clone + Copy + Debug + PartialEq,
+    I: Item + Default + Clone + Debug + PartialEq,
 {
     pub fn new(m: usize) -> Self {
         let items = vec![I::default(); m];
@@ -125,7 +125,7 @@ where
 
 impl<I> SymbolTable<I, I::Key> for ArraySymbolTable<I>
 where
-    I: Item + Default + Clone + Copy + Debug + PartialEq,
+    I: Item + Default + Clone + Debug + PartialEq,
 {
     fn count(&self) -> usize {
         self.count
@@ -151,7 +151,7 @@ where
         let mut i = self.count;
 
         while i > 0 && item.key() < self.items[i - 1].key() {
-            self.items[i] = self.items[i - 1];
+            self.items[i] = self.items[i - 1].clone();
             i -= 1;
         }
         self.items[i] = item;
@@ -164,7 +164,7 @@ where
             // shift the elements from higher indices so the current element is overwritten
             let mut j = i;
             while j < self.count {
-                self.items[j] = self.items[j + 1];
+                self.items[j] = self.items[j + 1].clone();
                 j += 1;
             }
             self.items[j - 1] = I::default();
@@ -172,7 +172,7 @@ where
     }
 
     fn select(&self, k: usize) -> I {
-        self.items[k]
+        self.items[k].clone()
     }
 
     fn show(&self) -> Vec<&dyn Item<Key = I::Key>> {
@@ -215,7 +215,7 @@ pub struct LinkedSymbolTable<I: Item> {
 
 impl<I> LinkedSymbolTable<I>
 where
-    I: Item + Default + Clone + Copy + PartialEq,
+    I: Item + Default + Clone + PartialEq,
 {
     pub fn new() -> Self {
         Self {
@@ -241,7 +241,7 @@ where
 
 impl<I> SymbolTable<I, I::Key> for LinkedSymbolTable<I>
 where
-    I: Item + Default + Clone + Copy + PartialEq,
+    I: Item + Default + Clone + PartialEq,
 {
     fn count(&self) -> usize {
         self.count

@@ -33,7 +33,7 @@ pub struct BinarySearchTree<I: Item> {
 
 impl<I> BinarySearchTree<I>
 where
-    I: Item + Default + Clone + Copy + PartialEq + Debug,
+    I: Item + Default + Clone + PartialEq + Debug,
 {
     pub fn new() -> Self {
         Self {
@@ -124,7 +124,7 @@ where
 
 impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
 where
-    I: Item + Default + Clone + Copy + PartialEq + Debug,
+    I: Item + Default + Clone + PartialEq + Debug,
 {
     fn count(&self) -> usize {
         self.count
