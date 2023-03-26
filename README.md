@@ -2,7 +2,7 @@
 
 This repository is based on the following books:
 * Algorithms in C++, 3rd edition, Robert Sedgewick, Addison-Wesley 1998.
-* Algorithms 4th edition, Robert Sedgewick, Kevin Wayne, Addison-Wesley, 2011.
+* Algorithms, 4th edition, Robert Sedgewick, Kevin Wayne, Addison-Wesley, 2011.
 
 [Professor Sedgewick](https://sedgewick.io/) has published a number of books on algorithms and the 
 different editions of the Algorithms book use different programming languages.
