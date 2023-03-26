@@ -227,7 +227,7 @@ mod test {
     }
 
     #[test]
-    fn test_rotate_left() {
+    fn test_rotate_right() {
         let mut bst = BinarySearchTree::<DoubleItem>::default();
 
         let i_7 = DoubleItem::with_key(7);
@@ -241,19 +241,21 @@ mod test {
         //       8   15
         //      / \
         //     7   9
+
         bst.insert(i_11);
         bst.insert(i_15);
         bst.insert(i_8);
         bst.insert(i_9);
         bst.insert(i_7);
 
+        let h = BinarySearchTree::rotate_right(bst.head);
 
-        let h = BinarySearchTree::rotate_right(bst.head);        
         //        8
         //       / \
         //      7   11
         //         /  \
         //        9    15
+
         assert_eq!(h.as_ref().unwrap().item, i_8);
 
         let left_subtree = Box::new(Node::new(i_7));
@@ -264,5 +266,45 @@ mod test {
 
         assert_eq!(h.as_ref().unwrap().left, Some(left_subtree));
         assert_eq!(h.as_ref().unwrap().right, Some(right_subtree));
+    }
+
+    #[test]
+    fn test_rotate_left() {
+        let mut bst = BinarySearchTree::<DoubleItem>::default();
+
+        let i_7 = DoubleItem::with_key(7);        
+        let i_8 = DoubleItem::with_key(8);
+        let i_9 = DoubleItem::with_key(9);
+        let i_11 = DoubleItem::with_key(11);
+
+        //         7
+        //        / \
+        //           9
+        //          / \
+        //         8  11
+
+        bst.insert(i_7);
+        bst.insert(i_9);
+        bst.insert(i_8);
+        bst.insert(i_11);
+
+        let h = BinarySearchTree::rotate_left(bst.head);
+
+        //         9
+        //        / \
+        //       7   11
+        //      / \
+        //         8
+        //         
+
+        assert_eq!(h.as_ref().unwrap().item, i_9);
+
+        let right_subtree = Box::new(Node::new(i_11));
+
+        let mut left_subtree = Box::new(Node::new(i_7));
+        left_subtree.right = Some(Box::new(Node::new(i_8)));
+        
+        assert_eq!(h.as_ref().unwrap().right, Some(right_subtree));
+        assert_eq!(h.as_ref().unwrap().left, Some(left_subtree));
     }
 }
