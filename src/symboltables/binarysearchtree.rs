@@ -8,6 +8,7 @@ type NodePtr<I> = Rc<RefCell<Node<I>>>;
 type Link<I> = Option<NodePtr<I>>;
 
 #[derive(Debug)]
+/// Nodes of the binary tree
 struct Node<I: Item> {
     item: I,
     left: Link<I>,
@@ -134,8 +135,7 @@ where
     ///
     /// ```
     fn rotate_right(root: &mut Link<I>) {
-        let _t = BinarySearchTree::do_rotate_right(root);
-        *root = _t;
+        *root = BinarySearchTree::do_rotate_right(root);
     }
 
     fn do_rotate_right(root: &mut Link<I>) -> Link<I> {
@@ -171,8 +171,7 @@ where
     ///               C
     /// ```
     fn rotate_left(root: &mut Link<I>) {
-        let _t = BinarySearchTree::do_rotate_left(root);
-        *root = _t;
+        *root = BinarySearchTree::do_rotate_left(root);
     }
 
     fn do_rotate_left(root: &mut Link<I>) -> Link<I> {
