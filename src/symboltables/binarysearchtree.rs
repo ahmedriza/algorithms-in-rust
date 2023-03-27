@@ -154,6 +154,23 @@ where
         }
         None
     }
+
+    fn insert_at_root(link: Link<I>, item: I) -> Link<I> {
+        match link {
+            Some(node) => {
+                if item.key() < node.item.key() {
+                    let l = BinarySearchTree::insert_at_root(node.left, item);
+                    // BinarySearchTree::rotate_right(l)
+                    todo!()
+                } else {
+                    let r = BinarySearchTree::insert_at_root(node.right, item);
+                    // BinarySearchTree::rotate_left(r)
+                    todo!()
+                }
+            }
+            None => Some(Box::new(Node::new(item))),
+        }
+    }
 }
 
 impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
@@ -191,6 +208,8 @@ where
 
 #[cfg(test)]
 mod test {
+    use std::{rc::Rc, cell::RefCell};
+
     use crate::symboltables::{
         binarysearchtree::Node,
         item::{DoubleItem, Item},
@@ -272,7 +291,7 @@ mod test {
     fn test_rotate_left() {
         let mut bst = BinarySearchTree::<DoubleItem>::default();
 
-        let i_7 = DoubleItem::with_key(7);        
+        let i_7 = DoubleItem::with_key(7);
         let i_8 = DoubleItem::with_key(8);
         let i_9 = DoubleItem::with_key(9);
         let i_11 = DoubleItem::with_key(11);
@@ -295,7 +314,7 @@ mod test {
         //       7   11
         //      / \
         //         8
-        //         
+        //
 
         assert_eq!(h.as_ref().unwrap().item, i_9);
 
@@ -303,8 +322,131 @@ mod test {
 
         let mut left_subtree = Box::new(Node::new(i_7));
         left_subtree.right = Some(Box::new(Node::new(i_8)));
-        
+
         assert_eq!(h.as_ref().unwrap().right, Some(right_subtree));
         assert_eq!(h.as_ref().unwrap().left, Some(left_subtree));
+    }
+
+    #[test]
+    fn test_insert_at_root() {
+        let mut bst = BinarySearchTree::<DoubleItem>::default();
+
+        let i_7 = DoubleItem::with_key(7);
+        let i_8 = DoubleItem::with_key(8);
+        let i_9 = DoubleItem::with_key(9);
+        let i_11 = DoubleItem::with_key(11);
+
+        //         7
+        //        / \
+        //           9
+        //            \
+        //            11
+
+        bst.insert(i_7);
+        bst.insert(i_9);
+        bst.insert(i_11);
+
+        println!("bst: {:#?}", bst.head);
+
+        // let _t = BinarySearchTree::insert_at_root(bst.head, i_8);
+    }
+
+    #[test]
+    fn test_tree() {
+
+        type NodePtr<I> = Option<Rc<RefCell<Node<I>>>>;
+
+        #[derive(Debug)]
+        struct Node<I: Item> {
+            item: I,
+            left: NodePtr<I>,
+            right: NodePtr<I>,
+        }
+
+        impl <I: Item> Node<I> {
+            pub fn new(item: I) -> Self {
+                Self {
+                    item,
+                    left: None,
+                    right: None,
+                }
+            }
+        }
+
+        #[derive(Default)]
+        struct Tree<I: Item> {
+            head: NodePtr<I>
+        }
+
+        impl <I: Item> Tree<I> {
+            pub fn insert_r(root: &mut NodePtr<I>, item: I) {
+                match root {
+                    Some(node) => {
+                        if item.key() < node.borrow().item.key() {
+                            Tree::insert_r(&mut node.borrow_mut().left, item)
+                        } else {
+                            Tree::insert_r(&mut node.borrow_mut().right, item)
+                        }
+                    },
+                    None => {
+                        root.replace(Rc::new(RefCell::new(Node::new(item))));
+                    }
+                }
+            }
+
+            pub fn insert(&mut self, item: I) {
+                Tree::insert_r(&mut self.head, item);
+            }
+        }
+
+        fn rotate_right<I: Item>(root: &mut NodePtr<I>) {
+            let _t = do_rotate_right(root);
+            *root = _t;
+        }
+
+        fn do_rotate_right<I: Item>(root: &mut NodePtr<I>) -> NodePtr<I> {
+            if let Some(s_node) = root {
+                let mut s = s_node.borrow_mut();
+                let e = s.left.clone();
+                if let Some(e_node) = e {
+                    s.left = e_node.borrow_mut().right.take();
+                    e_node.borrow_mut().right = Some(s_node.clone());
+                    return Some(e_node)
+                }
+            }
+            None
+        }
+
+        let i_7 = DoubleItem::with_key(7);
+        let i_8 = DoubleItem::with_key(8);
+        let i_9 = DoubleItem::with_key(9);
+        let i_11 = DoubleItem::with_key(11);
+        let i_15 = DoubleItem::with_key(15);
+
+        //         11
+        //        / \
+        //       8   15
+        //      / \
+        //     7   9
+
+        let mut bst = Tree::<DoubleItem>::default();
+
+        bst.insert(i_11);
+        bst.insert(i_15);
+        bst.insert(i_8);
+        bst.insert(i_9);
+        bst.insert(i_7);
+
+        println!("bst: {:#?}", bst.head);
+
+        rotate_right(&mut bst.head);
+
+        //        8
+        //       / \
+        //      7   11
+        //         /  \
+        //        9    15
+
+        println!("bst: {:#?}", bst.head);
     }
 }
