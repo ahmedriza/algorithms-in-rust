@@ -42,6 +42,37 @@ pub struct BinarySearchTree<I: Item> {
     count: usize,
 }
 
+impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
+where
+    I: Item + Default + Clone + PartialEq + Debug,
+{
+    fn count(&self) -> usize {
+        self.count
+    }
+
+    fn search(&self, key: I::Key) -> Option<I> {
+        BinarySearchTree::search_r(self.head.clone(), key)
+    }
+
+    fn insert(&mut self, item: I) {
+        BinarySearchTree::insert_r(&mut self.head, item);
+        self.count += 1;
+    }
+
+    fn remove(&mut self, _item: I) {
+        todo!()
+    }
+
+    fn select(&self, _k: usize) -> I {
+        todo!()
+    }
+
+    fn show(&self) -> Vec<I> {
+        let mut acc = vec![];
+        BinarySearchTree::show_r(self.head.clone(), &mut acc)
+    }
+}
+
 impl<I> BinarySearchTree<I>
 where
     I: Item + Default + Clone + PartialEq + Debug,
@@ -185,37 +216,6 @@ where
             }
         }
         None
-    }
-}
-
-impl<I> SymbolTable<I, I::Key> for BinarySearchTree<I>
-where
-    I: Item + Default + Clone + PartialEq + Debug,
-{
-    fn count(&self) -> usize {
-        self.count
-    }
-
-    fn search(&self, key: I::Key) -> Option<I> {
-        BinarySearchTree::search_r(self.head.clone(), key)
-    }
-
-    fn insert(&mut self, item: I) {
-        BinarySearchTree::insert_r(&mut self.head, item);
-        self.count += 1;
-    }
-
-    fn remove(&mut self, _item: I) {
-        todo!()
-    }
-
-    fn select(&self, _k: usize) -> I {
-        todo!()
-    }
-
-    fn show(&self) -> Vec<I> {
-        let mut acc = vec![];
-        BinarySearchTree::show_r(self.head.clone(), &mut acc)
     }
 }
 
