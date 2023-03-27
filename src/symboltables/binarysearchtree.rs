@@ -136,6 +136,7 @@ where
         }
     }
 
+    // traverse the tree in-order and collect the nodes
     fn show_r(root: Link<I>, acc: &mut Vec<I>) -> Vec<I> {
         if let Some(node) = root {
             BinarySearchTree::show_r(node.borrow().left.clone(), acc);
