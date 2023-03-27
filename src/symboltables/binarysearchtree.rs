@@ -124,28 +124,6 @@ where
         }
     }
 
-    // Recursive implementation of search
-    fn search_r(root: Link<I>, key: I::Key) -> Option<I> {
-        match root {
-            Some(node) => match key.cmp(&node.borrow().item.key()) {
-                Ordering::Less => BinarySearchTree::search_r(node.borrow().left.clone(), key),
-                Ordering::Equal => Some(node.borrow().item.clone()),
-                Ordering::Greater => BinarySearchTree::search_r(node.borrow().right.clone(), key),
-            },
-            None => None,
-        }
-    }
-
-    // traverse the tree in-order and collect the nodes
-    fn show_r(root: Link<I>, acc: &mut Vec<I>) -> Vec<I> {
-        if let Some(node) = root {
-            BinarySearchTree::show_r(node.borrow().left.clone(), acc);
-            acc.push(node.borrow().item.clone());
-            BinarySearchTree::show_r(node.borrow().right.clone(), acc);
-        }
-        acc.to_vec()
-    }
-
     /// Right rotation. In a right rotation, the left child of the root becomes the new root.
     /// For example, given the following tree where the root is at S:
     ///
@@ -217,6 +195,28 @@ where
             }
         }
         None
+    }
+
+    // Recursive implementation of search
+    fn search_r(root: Link<I>, key: I::Key) -> Option<I> {
+        match root {
+            Some(node) => match key.cmp(&node.borrow().item.key()) {
+                Ordering::Less => BinarySearchTree::search_r(node.borrow().left.clone(), key),
+                Ordering::Equal => Some(node.borrow().item.clone()),
+                Ordering::Greater => BinarySearchTree::search_r(node.borrow().right.clone(), key),
+            },
+            None => None,
+        }
+    }
+    
+    // traverse the tree in-order and collect the nodes
+    fn show_r(root: Link<I>, acc: &mut Vec<I>) -> Vec<I> {
+        if let Some(node) = root {
+            BinarySearchTree::show_r(node.borrow().left.clone(), acc);
+            acc.push(node.borrow().item.clone());
+            BinarySearchTree::show_r(node.borrow().right.clone(), acc);
+        }
+        acc.to_vec()
     }
 }
 
