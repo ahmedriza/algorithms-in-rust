@@ -1,5 +1,5 @@
 //! Items that can be stored in symbol tables
-use std::{any::Any, fmt::Debug};
+use std::fmt::Debug;
 
 use rand::{thread_rng, Rng};
 
@@ -10,15 +10,11 @@ pub trait Item: Debug {
     fn key(&self) -> Self::Key;
     fn null(&self) -> bool;
     fn rand(&mut self);
-    fn show(&self) -> &dyn Item<Key = Self::Key>;
-
-    // allow downcasting in order to implement PartialEq
-    fn as_any(&self) -> &dyn Any;
 }
 
 // This allows us to compare vectors of type Vec<&dyn Item<Key>> for an Key that has an `Ord`
 // implementation.
-// 
+//
 // Items are equal if their keys are equal. Due to the requirement on Item::Key to be `Ord`, we
 // also need the type `T` to be `Ord`.
 impl<T: Ord> PartialEq for dyn Item<Key = T> + '_ {
@@ -81,13 +77,5 @@ impl Item for DoubleItem {
         let mut _r = thread_rng();
         self.key_val = _r.gen::<Self::Key>();
         self.info = _r.gen::<f64>();
-    }
-
-    fn show(&self) -> &dyn Item<Key = Self::Key> {
-        self
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
     }
 }

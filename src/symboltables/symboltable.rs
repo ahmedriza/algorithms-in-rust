@@ -10,7 +10,7 @@ pub trait SymbolTable<I: Item + PartialEq, K> {
     fn count(&self) -> usize;
 
     /// Find an item with the given key
-    fn search(&self, key: K) -> Option<&I>;
+    fn search(&self, key: K) -> Option<I>;
 
     /// Insert an item
     fn insert(&mut self, item: I);
@@ -22,7 +22,7 @@ pub trait SymbolTable<I: Item + PartialEq, K> {
     fn select(&self, k: usize) -> I;
 
     /// Display the items
-    fn show(&self) -> Vec<&dyn Item<Key = K>>;
+    fn show(&self) -> Vec<I>;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -60,8 +60,8 @@ where
         n
     }
 
-    fn search(&self, key: usize) -> Option<&I> {
-        Some(&self.items[key])
+    fn search(&self, key: usize) -> Option<I> {
+        Some(self.items[key].clone())
     }
 
     fn insert(&mut self, item: I) {
@@ -85,11 +85,11 @@ where
         I::default()
     }
 
-    fn show(&self) -> Vec<&dyn Item<Key = usize>> {
+    fn show(&self) -> Vec<I> {
         let mut result = vec![];
         for i in 0..self.m {
             if !self.items[i].null() {
-                let item = self.items[i].show();
+                let item = self.items[i].clone();
                 result.push(item);
             }
         }
@@ -131,7 +131,7 @@ where
         self.count
     }
 
-    fn search(&self, key: I::Key) -> Option<&I> {
+    fn search(&self, key: I::Key) -> Option<I> {
         let mut k = 0;
         for i in 0..self.count {
             if self.items[i].key() >= key {
@@ -140,7 +140,7 @@ where
             k += 1;
         }
         if key == self.items[k].key() {
-            return Some(&self.items[k]);
+            return Some(self.items[k].clone());
         }
         None
     }
@@ -175,11 +175,11 @@ where
         self.items[k].clone()
     }
 
-    fn show(&self) -> Vec<&dyn Item<Key = I::Key>> {
+    fn show(&self) -> Vec<I> {
         let mut result = vec![];
         let mut i = 0;
         while i < self.count {
-            let item = self.items[i].show();
+            let item = self.items[i].clone();
             if !item.null() {
                 result.push(item);
             }
@@ -225,11 +225,11 @@ where
     }
 
     // recursive implementation of search.
-    fn search_r(link: &Link<I>, key: I::Key) -> Option<&I> {
+    fn search_r(link: &Link<I>, key: I::Key) -> Option<I> {
         match link {
             Some(t) => {
                 if t.item.key() == key {
-                    Some(&t.item)
+                    Some(t.item.clone())
                 } else {
                     LinkedSymbolTable::search_r(&t.next, key)
                 }
@@ -247,7 +247,7 @@ where
         self.count
     }
 
-    fn search(&self, key: I::Key) -> Option<&I> {
+    fn search(&self, key: I::Key) -> Option<I> {
         LinkedSymbolTable::search_r(&self.head, key)
     }
 
@@ -265,7 +265,7 @@ where
     }
 
     // The list is not in order. `show` should return items in order for a correct implementation.
-    fn show(&self) -> Vec<&dyn Item<Key = I::Key>> {
+    fn show(&self) -> Vec<I> {
         todo!()
     }
 }
@@ -274,7 +274,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::symboltables::item::{DoubleItem, Item};
+    use crate::symboltables::item::DoubleItem;
 
     use super::{ArraySymbolTable, KeyIndexedSymbolTable, LinkedSymbolTable, SymbolTable};
 
@@ -302,19 +302,19 @@ mod test {
         st.insert(i3);
 
         // an item that exists
-        assert_eq!(st.search(15), Some(&DoubleItem::with_key(15)));
+        assert_eq!(st.search(15), Some(DoubleItem::with_key(15)));
         // non-existent item
         assert_eq!(st.search(150), None);
 
         assert_eq!(st.select(1), DoubleItem::with_key(15));
 
-        let expected: Vec<&dyn Item<Key = usize>> = vec![&i1, &i3, &i2];
+        let expected = vec![i1, i3, i2];
         assert_eq!(st.show(), expected);
 
         // remove the item with key 15
         st.remove(i3);
 
-        let expected: Vec<&dyn Item<Key = usize>> = vec![&i1, &i2];
+        let expected = vec![i1, i2];
         assert_eq!(st.show(), expected);
     }
 
@@ -328,7 +328,7 @@ mod test {
         st.insert(i2);
         st.insert(i3);
 
-        assert_eq!(st.search(15), Some(&DoubleItem::with_key(15)));
+        assert_eq!(st.search(15), Some(DoubleItem::with_key(15)));
 
         // non-existent item
         assert_eq!(st.search(150), None);
