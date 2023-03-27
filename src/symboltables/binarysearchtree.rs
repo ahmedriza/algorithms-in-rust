@@ -7,8 +7,8 @@ type NodePtr<I> = Rc<RefCell<Node<I>>>;
 
 type Link<I> = Option<NodePtr<I>>;
 
-#[derive(Debug)]
 /// Nodes of the binary tree
+#[derive(Debug)]
 struct Node<I: Item> {
     item: I,
     left: Link<I>,
