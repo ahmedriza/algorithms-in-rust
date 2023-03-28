@@ -25,6 +25,63 @@ impl<T: Ord> PartialEq for dyn Item<Key = T> + '_ {
 
 // -------------------------------------------------------------------------------------------------
 
+#[derive(Clone)]
+pub struct GenericItem<K, V> {
+    key: K,
+    null_key: K,
+    value: V,
+}
+
+impl <K: Debug, V: Debug> Debug for GenericItem<K, V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GenericItem").field("key", &self.key).field("value", &self.value).finish()
+    }
+}
+
+impl<K: Default, V: Default> Default for GenericItem<K, V> {
+    fn default() -> Self {
+        Self {
+            key: Default::default(),
+            null_key: Default::default(),
+            value: Default::default(),
+        }
+    }
+}
+
+impl<K: Ord, V> PartialEq for GenericItem<K, V> {
+    fn eq(&self, other: &Self) -> bool {
+        self.key == other.key
+    }
+}
+
+impl<K: Clone + Debug + Ord, V: Debug> Item for GenericItem<K, V> {
+    type Key = K;
+
+    fn key(&self) -> Self::Key {
+        self.key.clone()
+    }
+
+    fn null(&self) -> bool {
+        self.key == self.null_key
+    }
+
+    fn rand(&mut self) {
+        unimplemented!()
+    }
+}
+
+impl<K: Default, V: Default> GenericItem<K, V> {
+    pub fn new(key: K) -> Self {
+        Self {
+            key,
+            null_key: K::default(),
+            value: V::default(),
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 const MAX_KEY: usize = 1000;
 type DoubleItemKey = usize;
 

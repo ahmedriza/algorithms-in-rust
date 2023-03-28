@@ -228,7 +228,7 @@ mod test {
 
     use crate::symboltables::{
         binarysearchtree::Node,
-        item::{DoubleItem, Item},
+        item::{DoubleItem, Item, GenericItem},
         symboltable::SymbolTable,
     };
 
@@ -349,7 +349,7 @@ mod test {
     }
 
     #[test]
-    fn test_insert_at_root() {
+    fn test_insert_at_root_one() {
         let mut bst = BinarySearchTree::<DoubleItem>::default();
 
         let i_7 = DoubleItem::with_key(7);
@@ -384,6 +384,65 @@ mod test {
             bst.head.as_ref().unwrap().borrow().right,
             Some(right_subtree)
         );
+    }
+
+    #[test]
+    fn test_insert_at_root_two() {
+        let mut bst = BinarySearchTree::<GenericItem<String, f64>>::default();
+
+        let i_a = GenericItem::<String, f64>::new("A".to_string());
+        let i_c = GenericItem::<String, f64>::new("C".to_string());
+        let i_e = GenericItem::<String, f64>::new("E".to_string());
+        let i_s = GenericItem::<String, f64>::new("S".to_string());
+        let i_x = GenericItem::<String, f64>::new("X".to_string());
+        let i_r = GenericItem::<String, f64>::new("R".to_string());
+        let i_h = GenericItem::<String, f64>::new("H".to_string());
+        let i_g = GenericItem::<String, f64>::new("G".to_string());
+
+        //       A
+        //      / \
+        //         S
+        //        / \
+        //       E   X
+        //      / \
+        //     C   R
+        //        / \
+        //       H
+        //      
+        bst.insert(i_a.clone());
+        bst.insert(i_s.clone());
+        bst.insert(i_x.clone());
+        bst.insert(i_e.clone());
+        bst.insert(i_c.clone());
+        bst.insert(i_r.clone());
+        bst.insert(i_h.clone());
+
+        bst.insert_at_root(i_g);
+
+        //         G
+        //       /   \
+        //      A     S
+        //     / \    /\
+        //        E  R  X
+        //       /  /
+        //      C  H
+
+        let node_a = Node::new(i_a);
+        let node_e = Node::new(i_e);
+        node_e.borrow_mut().left  = Some(Node::new(i_c));
+        node_a.borrow_mut().right = Some(node_e);
+        let left_subtree = Some(node_a);
+
+
+        let node_r = Node::new(i_r);
+        node_r.borrow_mut().left = Some(Node::new(i_h));
+        let node_s = Node::new(i_s);
+        node_s.borrow_mut().right = Some(Node::new(i_x));
+        node_s.borrow_mut().left = Some(node_r);
+        let right_subtree = Some(node_s);
+
+        assert_eq!(bst.head.as_ref().unwrap().borrow().left, left_subtree);
+        assert_eq!(bst.head.as_ref().unwrap().borrow().right, right_subtree);
     }
 
     #[allow(unused)]
