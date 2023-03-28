@@ -417,6 +417,7 @@ mod test {
         bst.insert(i_r.clone());
         bst.insert(i_h.clone());
 
+        // insert 'G' at root
         bst.insert_at_root(i_g);
 
         //         G
