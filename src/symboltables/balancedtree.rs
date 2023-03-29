@@ -134,6 +134,9 @@ where
                         BalancedTree::put_r(&mut node.borrow_mut().right, key, value);
                     }
                 }
+                let left_size = BalancedTree::_size(&node.borrow().left);
+                let right_size = BalancedTree::_size(&node.borrow().right);
+                node.borrow_mut().n = left_size + right_size + 1;
             }
             None => {
                 link.replace(Node::new(key, value, 1));
@@ -181,15 +184,17 @@ mod test {
     fn test_put() {
         let mut tree = BalancedTree::<String, u32>::new();
 
-        //       A
+        // The numbers in brackets indicate the number of nodes in the subtree
+        //
+        //       A (7)
         //      / \
-        //         S
+        //         S (6)
         //        / \
-        //       E   X
+        //   (4) E   X (1)
         //      / \
-        //     C   R
+        // (1) C   R (2)
         //        / \
-        //       H
+        //   (1) H
         //
 
         tree.put("A".into(), 0);
@@ -201,5 +206,7 @@ mod test {
         tree.put("H".into(), 0);
 
         println!("{:#?}", tree);
+
+        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
     }
 }
