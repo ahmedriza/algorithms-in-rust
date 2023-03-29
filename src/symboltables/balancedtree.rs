@@ -205,6 +205,9 @@ mod test {
         tree.put("R".into(), 0);
         tree.put("H".into(), 0);
 
+        // update the value of node C
+        tree.put("C".into(), 42);
+        
         println!("{:#?}", tree);
 
         assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
