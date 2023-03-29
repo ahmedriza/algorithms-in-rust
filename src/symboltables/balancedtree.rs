@@ -1,10 +1,11 @@
 #![allow(unused)]
 
-use std::{cell::RefCell, cmp::Ordering, rc::Rc};
+use std::{cell::RefCell, cmp::Ordering, fmt::Debug, rc::Rc};
 
 type NodePtr<K, V> = Rc<RefCell<Node<K, V>>>;
 type Link<K, V> = Option<NodePtr<K, V>>;
 
+#[derive(Debug)]
 struct Node<K, V> {
     key: K,
     value: V,
@@ -26,15 +27,20 @@ impl<K, V> Node<K, V> {
     }
 }
 
+#[derive(Default, Debug)]
 pub struct BalancedTree<K, V> {
     root: Link<K, V>, // root of the tree
 }
 
 impl<K, V> BalancedTree<K, V>
 where
-    K: Ord,
-    V: Clone,
+    K: Ord + Debug,
+    V: Clone + Debug,
 {
+    pub fn new() -> Self {
+        Self { root: None }
+    }
+
     /// Return the smallest key greater than or equal to the given key
     pub fn ceiling(&self, key: K) -> K {
         todo!()
@@ -106,9 +112,33 @@ where
         todo!()
     }
 
-    /// Put the key, value pair into the table
-    pub fn put(&self, key: K, value: V) {
-        todo!()
+    /// Put the key, value pair into the table. Update the value if found, if not add the
+    /// new key value pair.
+    pub fn put(&mut self, key: K, value: V) {
+        BalancedTree::put_r(&mut self.root, key, value);
+    }
+
+    fn put_r(link: &mut Link<K, V>, key: K, value: V) {
+        match link {
+            Some(node) => {
+                // store the ordering in a temporary to avoid overlapping borrows.
+                let ordering = key.cmp(&node.borrow().key);
+                match ordering {
+                    Ordering::Less => {
+                        BalancedTree::put_r(&mut node.borrow_mut().left, key, value);
+                    }
+                    Ordering::Equal => {
+                        node.borrow_mut().value = value;
+                    }
+                    Ordering::Greater => {
+                        BalancedTree::put_r(&mut node.borrow_mut().right, key, value);
+                    }
+                }
+            }
+            None => {
+                link.replace(Node::new(key, value, 1));
+            }
+        }
     }
 
     /// Number of keys less than the given key
@@ -136,5 +166,40 @@ where
             Some(node) => node.borrow().n,
             None => 0,
         }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(test)]
+mod test {
+    use std::{cell::RefCell, rc::Rc};
+
+    use super::BalancedTree;
+
+    #[test]
+    fn test_put() {
+        let mut tree = BalancedTree::<String, u32>::new();
+
+        //       A
+        //      / \
+        //         S
+        //        / \
+        //       E   X
+        //      / \
+        //     C   R
+        //        / \
+        //       H
+        //
+
+        tree.put("A".into(), 0);
+        tree.put("S".into(), 0);
+        tree.put("X".into(), 0);
+        tree.put("E".into(), 0);
+        tree.put("C".into(), 0);
+        tree.put("R".into(), 0);
+        tree.put("H".into(), 0);
+
+        println!("{:#?}", tree);
     }
 }
