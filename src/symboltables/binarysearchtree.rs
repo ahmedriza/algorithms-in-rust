@@ -208,7 +208,7 @@ where
             None => None,
         }
     }
-    
+
     // traverse the tree in-order and collect the nodes
     fn show_r(root: Link<I>, acc: &mut Vec<I>) -> Vec<I> {
         if let Some(node) = root {
@@ -228,7 +228,7 @@ mod test {
 
     use crate::symboltables::{
         binarysearchtree::Node,
-        item::{DoubleItem, Item, GenericItem},
+        item::{DoubleItem, GenericItem, Item},
         symboltable::SymbolTable,
     };
 
@@ -408,7 +408,7 @@ mod test {
         //     C   R
         //        / \
         //       H
-        //      
+        //
         bst.insert(i_a.clone());
         bst.insert(i_s.clone());
         bst.insert(i_x.clone());
@@ -430,10 +430,9 @@ mod test {
 
         let node_a = Node::new(i_a);
         let node_e = Node::new(i_e);
-        node_e.borrow_mut().left  = Some(Node::new(i_c));
+        node_e.borrow_mut().left = Some(Node::new(i_c));
         node_a.borrow_mut().right = Some(node_e);
         let left_subtree = Some(node_a);
-
 
         let node_r = Node::new(i_r);
         node_r.borrow_mut().left = Some(Node::new(i_h));
