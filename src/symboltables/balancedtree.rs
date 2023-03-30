@@ -34,7 +34,7 @@ pub struct BalancedTree<K, V> {
 
 impl<K, V> BalancedTree<K, V>
 where
-    K: Ord + Debug,
+    K: Clone + Debug + Ord,
     V: Clone + Debug,
 {
     pub fn new() -> Self {
@@ -48,7 +48,7 @@ where
 
     /// Returns whether there's a value paired with the given key in the table
     pub fn contains(&self, key: K) -> bool {
-        todo!()
+        self.get(key).is_some()
     }
 
     /// Delete the key (and value) from the table
@@ -94,7 +94,20 @@ where
 
     /// Return all keys in the table in sorted order
     pub fn keys(&self) -> Vec<K> {
-        todo!()
+        let mut result = vec![];
+        BalancedTree::keys_r(&self.root, &mut result);
+        result
+    }
+
+    fn keys_r(link: &Link<K, V>, acc: &mut Vec<K>) {
+        match link {
+            Some(node) => {
+                BalancedTree::keys_r(&node.borrow().left, acc);
+                acc.push(node.borrow().key.clone());
+                BalancedTree::keys_r(&node.borrow().right, acc);
+            }
+            None => {}
+        }
     }
 
     /// Return keys in [lo..hi] in sorted order
