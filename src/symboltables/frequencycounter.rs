@@ -101,7 +101,7 @@ mod test {
         assert_eq!(frequency_counter.distinct, 20);
         assert_eq!(frequency_counter.max, "it");
         assert_eq!(frequency_counter.frequency, 10);
-
+        
         // let frequency_counter = FrequencyCounter::new("/work/algs4-data/leipzig1M.txt", 10);
         // assert_eq!(frequency_counter.words, 1610829);
         // assert_eq!(frequency_counter.distinct, 165555);
