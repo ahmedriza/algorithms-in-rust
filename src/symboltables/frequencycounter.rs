@@ -3,14 +3,15 @@ use std::{
     path::Path,
 };
 
-use super::balancedtree::BalancedTree;
+use super::balancedtree::{BalancedTree, SymbolTableStatistics};
 
 #[derive(Debug)]
 pub struct FrequencyCounter {
-    pub words: usize,    // total number of words
-    pub distinct: usize, // number of distinct words
-    pub max: String,     // most frequent word
-    pub frequency: u32,  // frequency of the most frequent word
+    pub words: usize,                      // total number of words
+    pub distinct: usize,                   // number of distinct words
+    pub max: String,                       // most frequent word
+    pub frequency: u32,                    // frequency of the most frequent word
+    pub statistics: SymbolTableStatistics, // symbol table statistics
 }
 
 // Sample client program to test symbol tables. Takes the name of a file containing text
@@ -27,25 +28,29 @@ impl FrequencyCounter {
 
         let f = std::fs::File::open(path).unwrap();
         let br = BufReader::new(f);
-        // Build symbol table and count frequencies
+
+        let mut all_words = vec![];
         for line in br.lines() {
             let line = line.unwrap();
-            let words_list = FrequencyCounter::words(&line);
-            for word in words_list {
-                let word = word.to_string();
-                if word.len() < min_length {
-                    continue;
-                }
-                words += 1;
-                if !tree.contains(word.clone()) {
-                    tree.put(word, 1);
-                    distinct += 1;
-                } else {
-                    let current_count = tree.get(word.clone()).unwrap();
-                    tree.put(word, current_count + 1);
-                }
+            let mut words_list = FrequencyCounter::words(&line);
+            all_words.append(&mut words_list);
+        }
+
+        // Build symbol table and count frequencies
+        for word in all_words {
+            if word.len() < min_length {
+                continue;
+            }
+            words += 1;
+            if !tree.contains(word.clone()) {
+                tree.put(word, 1);
+                distinct += 1;
+            } else {
+                let current_count = tree.get(word.clone()).unwrap();
+                tree.put(word, current_count + 1);
             }
         }
+
         // Find the key with the highest frequency
         let mut max = "".to_string();
         tree.put(max.clone(), 0);
@@ -62,11 +67,14 @@ impl FrequencyCounter {
             distinct,
             max,
             frequency,
+            statistics: tree.statistics(words),
         }
     }
 
-    fn words(line: &str) -> Vec<&str> {
-        line.split_ascii_whitespace().collect()
+    fn words(line: &str) -> Vec<String> {
+        line.split_ascii_whitespace()
+            .map(|s| s.to_string())
+            .collect()
     }
 }
 
@@ -90,7 +98,7 @@ mod test {
     fn test_count() {
         let frequency_counter = FrequencyCounter::new("resources/tinyTale.txt", 1);
         assert_eq!(frequency_counter.words, 60);
-        assert_eq!(frequency_counter.distinct, 20);        
+        assert_eq!(frequency_counter.distinct, 20);
         assert_eq!(frequency_counter.max, "it");
         assert_eq!(frequency_counter.frequency, 10);
 

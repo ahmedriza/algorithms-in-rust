@@ -27,9 +27,30 @@ impl<K, V> Node<K, V> {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct SymbolTableStatistics {
+    average_put_cost: f64,
+}
+
+impl SymbolTableStatistics {
+    pub fn new(compares_put: usize, total_puts: usize) -> Self {
+        // The average cost of a put operation is:
+        // 1 + the total number of comparisons done during puts divided by the total number of
+        // put operations.
+        //
+        // The theoretical value is ~ 1.39 lg N
+        // See: Algorithms, 4th edition, Robert Sedgewick, Kevin Wayne, Addition-Wesley, 2011
+        //
+        let average_put_cost = 1.0 + compares_put as f64 / total_puts as f64;
+        Self { average_put_cost }
+    }
+}
+
 #[derive(Default, Debug)]
 pub struct BalancedTree<K, V> {
     root: Link<K, V>, // root of the tree
+    // Number of compares for the put operation
+    compares_put: usize,
 }
 
 impl<K, V> BalancedTree<K, V>
@@ -38,7 +59,10 @@ where
     V: Clone + Debug,
 {
     pub fn new() -> Self {
-        Self { root: None }
+        Self {
+            root: None,
+            compares_put: 0,
+        }
     }
 
     /// Return the smallest key greater than or equal to the given key
@@ -89,7 +113,7 @@ where
 
     /// Is the table empty or not?
     pub fn is_empty(&self) -> bool {
-        todo!()
+        self.size() == 0
     }
 
     /// Return all keys in the table in sorted order
@@ -128,23 +152,24 @@ where
     /// Put the key, value pair into the table. Update the value if found, if not add the
     /// new key value pair.
     pub fn put(&mut self, key: K, value: V) {
-        BalancedTree::put_r(&mut self.root, key, value);
+        BalancedTree::put_r(&mut self.root, key, value, &mut self.compares_put);
     }
 
-    fn put_r(link: &mut Link<K, V>, key: K, value: V) {
+    fn put_r(link: &mut Link<K, V>, key: K, value: V, compares_put: &mut usize) {
         match link {
             Some(node) => {
                 // store the ordering in a temporary to avoid overlapping borrows.
                 let ordering = key.cmp(&node.borrow().key);
+                *compares_put += 1;
                 match ordering {
                     Ordering::Less => {
-                        BalancedTree::put_r(&mut node.borrow_mut().left, key, value);
+                        BalancedTree::put_r(&mut node.borrow_mut().left, key, value, compares_put);
                     }
                     Ordering::Equal => {
                         node.borrow_mut().value = value;
                     }
                     Ordering::Greater => {
-                        BalancedTree::put_r(&mut node.borrow_mut().right, key, value);
+                        BalancedTree::put_r(&mut node.borrow_mut().right, key, value, compares_put);
                     }
                 }
                 let left_size = BalancedTree::_size(&node.borrow().left);
@@ -175,6 +200,11 @@ where
     /// Return the number of key, value pairs in the table
     pub fn size(&self) -> usize {
         BalancedTree::_size(&self.root)
+    }
+
+    /// Get the collected statistics
+    pub fn statistics(&self, total_puts: usize) -> SymbolTableStatistics {
+        SymbolTableStatistics::new(self.compares_put, total_puts)
     }
 
     fn _size(link: &Link<K, V>) -> usize {
@@ -220,7 +250,7 @@ mod test {
 
         // update the value of node C
         tree.put("C".into(), 42);
-        
+
         println!("{:#?}", tree);
 
         assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
