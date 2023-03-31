@@ -81,7 +81,7 @@ where
     }
 
     /// Delete the largest key (and value) from the table
-    pub fn delete_man(&self) {
+    pub fn delete_max(&self) {
         todo!()
     }
 
