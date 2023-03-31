@@ -139,14 +139,54 @@ where
         todo!()
     }
 
-    /// Return the largest key
+    /// Return the largest key.
+    ///
+    /// If the right link of the root is null, the largest key is the key at the root.
+    /// If the right link is not null, the largest key is the largest key in the subtree rooted
+    /// at the node referenced by the right link.
     pub fn max(&self) -> K {
-        todo!()
+        BalancedTree::max_r(&self.root)
+    }
+
+    fn max_r(link: &Link<K, V>) -> K {
+        match link {
+            Some(node) => match node.borrow().right {
+                Some(_) => {
+                    return BalancedTree::max_r(&node.borrow().right);
+                }
+                None => {
+                    return node.borrow().key.clone();
+                }
+            },
+            None => {
+                panic!("Empty tree");
+            }
+        }
     }
 
     /// Return the smallest key
+    ///
+    /// If the left link of the root is null, the smallest key is the key at the root.
+    /// If the left link is not null, the smallest key is the smallest key in the subtree rooted
+    /// at the node referenced by the left link.     
     pub fn min(&self) -> K {
-        todo!()
+        BalancedTree::min_r(&self.root)
+    }
+
+    fn min_r(link: &Link<K, V>) -> K {
+        match link {
+            Some(node) => match node.borrow().left {
+                Some(_) => {
+                    return BalancedTree::min_r(&node.borrow().left);
+                }
+                None => {
+                    return node.borrow().key.clone();
+                }
+            },
+            None => {
+                panic!("Empty tree");
+            }
+        }
     }
 
     /// Put the key, value pair into the table. Update the value if found, if not add the
@@ -225,6 +265,27 @@ mod test {
 
     #[test]
     fn test_put() {
+        let mut tree = make_tree();
+
+        // update the value of node C
+        tree.put("C".into(), 42);
+
+        println!("{:#?}", tree);
+
+        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
+    }
+
+    #[test]
+    fn test_min_max() {
+        let tree = make_tree();
+        let min = tree.min();
+        assert_eq!("A", min);
+
+        let max = tree.max();
+        assert_eq!("X", max);
+    }
+
+    fn make_tree() -> BalancedTree<String, u32> {
         let mut tree = BalancedTree::<String, u32>::new();
 
         // The numbers in brackets indicate the number of nodes in the subtree
@@ -247,12 +308,6 @@ mod test {
         tree.put("C".into(), 0);
         tree.put("R".into(), 0);
         tree.put("H".into(), 0);
-
-        // update the value of node C
-        tree.put("C".into(), 42);
-
-        println!("{:#?}", tree);
-
-        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
+        tree
     }
 }
