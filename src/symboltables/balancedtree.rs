@@ -65,7 +65,7 @@ where
         }
     }
 
-    /// Return the smallest key greater than or equal to the given key
+    /// Return the smallest key >= to the given key
     pub fn ceiling(&self, key: K) -> K {
         todo!()
     }
@@ -90,9 +90,34 @@ where
         todo!()
     }
 
-    /// Return the largest key less than or equal to the given key
-    pub fn floor(&self, key: K) -> K {
-        todo!()
+    /// Return the largest key <= to the given key.
+    ///
+    /// If the given key is *less than* they key at the root, then the floor of the key *must*
+    /// be in the left subtree.
+    ///
+    /// If the key is *greater than* the key at the root, then the floor of the key *could* be
+    /// in the right subtree, but only if there is a key smaller than or equal to *key* in the
+    /// right subtree; if not (or if key is equal to the key at the root), then the key at the root
+    /// is the floor of the key.
+    pub fn floor(&self, key: K) -> Option<K> {
+        BalancedTree::floor_r(&self.root, key)
+    }
+
+    fn floor_r(link: &Link<K, V>, key: K) -> Option<K> {
+        match link {
+            Some(node) => match key.cmp(&node.borrow().key) {
+                Ordering::Less => BalancedTree::floor_r(&node.borrow().left, key),
+                Ordering::Equal => Some(node.borrow().key.clone()),
+                Ordering::Greater => {
+                    let t = BalancedTree::floor_r(&node.borrow().right, key);
+                    match t {
+                        s @ Some(_) => s,
+                        None => Some(node.borrow().key.clone()),
+                    }
+                }
+            },
+            None => None,
+        }
     }
 
     /// Return the value that corresponds to the given key
@@ -284,6 +309,32 @@ mod test {
         let max = tree.max();
         assert_eq!("X", max);
     }
+
+    #[test]
+    fn test_floor() {
+        let mut tree = BalancedTree::<String, u32>::new();
+
+        //         S
+        //        /  \
+        //       E    X
+        //      /  \
+        //     A    R
+        //    / \   / \
+        //       C H
+        //        / \
+        //            M
+        // 
+        tree.put("S".into(), 0);
+        tree.put("E".into(), 0);
+        tree.put("X".into(), 0);
+        tree.put("R".into(), 0);
+        tree.put("A".into(), 0);
+        tree.put("C".into(), 0);
+        tree.put("H".into(), 0);
+        tree.put("M".into(), 0);
+
+        assert_eq!(tree.floor("G".to_string()), Some("E".to_string()));
+    } 
 
     fn make_tree() -> BalancedTree<String, u32> {
         let mut tree = BalancedTree::<String, u32>::new();
