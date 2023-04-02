@@ -66,8 +66,35 @@ where
     }
 
     /// Return the smallest key >= to the given key
-    pub fn ceiling(&self, key: K) -> K {
-        todo!()
+    ///
+    /// If the given key is *greater than* they key at the root, then the ceil of the key *must*
+    /// be in the right subtree.
+    ///
+    /// If the key is *less than* the key at the root, then the ceil of the key *could* be
+    /// in the left subtree, but only if there is a key larger than or equal to *key* in the
+    /// left subtree; if not (or if key is equal to the key at the root), then the key at the root
+    /// is the ceil of the key.    
+    pub fn ceiling(&self, key: K) -> Option<K> {
+        BalancedTree::ceil_r(&self.root, key)
+    }
+
+    fn ceil_r(link: &Link<K, V>, key: K) -> Option<K> {
+        match link {
+            Some(node) => {
+                match key.cmp(&node.borrow().key) {
+                    Ordering::Less => {
+                        let t = BalancedTree::ceil_r(&node.borrow().left, key);
+                        match t {
+                            s @ Some(_) => s,
+                            None => Some(node.borrow().key.clone())
+                        }
+                    }
+                    Ordering::Equal => Some(node.borrow().key.clone()),
+                    Ordering::Greater => BalancedTree::ceil_r(&node.borrow().right, key),
+                }
+            }
+            None => None,
+        }
     }
 
     /// Returns whether there's a value paired with the given key in the table
