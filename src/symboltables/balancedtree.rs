@@ -80,19 +80,17 @@ where
 
     fn ceiling_r(link: &Link<K, V>, key: K) -> Option<K> {
         match link {
-            Some(node) => {
-                match key.cmp(&node.borrow().key) {
-                    Ordering::Less => {
-                        let t = BalancedTree::ceiling_r(&node.borrow().left, key);
-                        match t {
-                            s @ Some(_) => s,
-                            None => Some(node.borrow().key.clone())
-                        }
+            Some(node) => match key.cmp(&node.borrow().key) {
+                Ordering::Less => {
+                    let t = BalancedTree::ceiling_r(&node.borrow().left, key);
+                    match t {
+                        s @ Some(_) => s,
+                        None => Some(node.borrow().key.clone()),
                     }
-                    Ordering::Equal => Some(node.borrow().key.clone()),
-                    Ordering::Greater => BalancedTree::ceiling_r(&node.borrow().right, key),
                 }
-            }
+                Ordering::Equal => Some(node.borrow().key.clone()),
+                Ordering::Greater => BalancedTree::ceiling_r(&node.borrow().right, key),
+            },
             None => None,
         }
     }
@@ -279,9 +277,54 @@ where
         todo!()
     }
 
-    /// Return the key of rank k
+    /// Return the key of rank k (i.e. k_th smallest key)
+    /// the key such that precisely k other keys in the BST are smaller
     pub fn select(&self, k: usize) -> K {
+        //
+        // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        //
+        // select(5) = 6
+        // select(8) = 9
+        //
+        // We maintain in BST nodes the variable N that counts the number of keys in the subtree
+        // rooted at that node.
+        // The numbers in brackets indicate the number of nodes in the subtree
+        //
+        //       A (7)
+        //      / \
+        //         S (6)
+        //        / \
+        //   (4) E   X (1)
+        //      / \
+        // (1) C   R (2)
+        //        / \
+        //   (1) H
+        //
+        // A, C, E, H, R, S, X
+        //
+
         todo!()
+    }
+
+    /// Display the tree nodes in order
+    pub fn show(&self) {
+        BalancedTree::show_r(&self.root);
+    }
+
+    fn show_r(link: &Link<K, V>) {
+        match link {
+            Some(node) => {
+                BalancedTree::show_r(&node.borrow().left);
+                println!(
+                    "(k: {:?}, v: {:?}, n: {})",
+                    node.borrow().key,
+                    node.borrow().value,
+                    node.borrow().n
+                );
+                BalancedTree::show_r(&node.borrow().right);
+            }
+            None => {}
+        }
     }
 
     /// Return the number of keys in [lo..hi]
@@ -322,9 +365,7 @@ mod test {
         // update the value of node C
         tree.put("C".into(), 42);
 
-        println!("{:#?}", tree);
-
-        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 7);
+        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 8);
     }
 
     #[test]
@@ -350,7 +391,7 @@ mod test {
         //       C H
         //        / \
         //            M
-        // 
+        //
         tree.put("S".into(), 0);
         tree.put("E".into(), 0);
         tree.put("X".into(), 0);
@@ -376,7 +417,7 @@ mod test {
         //       C H
         //        / \
         //            M
-        // 
+        //
         tree.put("S".into(), 0);
         tree.put("E".into(), 0);
         tree.put("X".into(), 0);
@@ -389,31 +430,47 @@ mod test {
         assert_eq!(tree.ceiling("T".to_string()), Some("X".into()));
         assert_eq!(tree.ceiling("D".to_string()), Some("E".into()));
         assert_eq!(tree.ceiling("G".to_string()), Some("H".into()));
-    }     
+    }
+
+    #[test]
+    fn test_select() {
+        let tree = make_tree();
+        tree.show();
+    }
 
     fn make_tree() -> BalancedTree<String, u32> {
         let mut tree = BalancedTree::<String, u32>::new();
 
         // The numbers in brackets indicate the number of nodes in the subtree
         //
-        //       A (7)
-        //      / \
-        //         S (6)
-        //        / \
-        //   (4) E   X (1)
-        //      / \
-        // (1) C   R (2)
-        //        / \
-        //   (1) H
-        //
-
-        tree.put("A".into(), 0);
+        //                     +-------+
+        //                     | S (8) |
+        //                     +-------+
+        //                    /         \
+        //            +-------+          +-------+
+        //            |  E(6) |          |  X (1)|
+        //            +-------+          +-------+
+        //           /         \
+        //  +-------+          +-------+
+        //  | A (2) |          | R (3) |
+        //  +-------+          +-------+
+        // /         \        /      
+        //      +-------+    +-------+
+        //      | C (1) |    |  H (2)|
+        //      +-------+    +-------+
+        //                            \
+        //                             +-------+
+        //                             | M (1) |
+        //                             +-------+
         tree.put("S".into(), 0);
         tree.put("X".into(), 0);
         tree.put("E".into(), 0);
+        tree.put("A".into(), 0);
         tree.put("C".into(), 0);
         tree.put("R".into(), 0);
         tree.put("H".into(), 0);
+        tree.put("M".into(), 0);
+        
         tree
     }
 }
