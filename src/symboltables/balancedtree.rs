@@ -365,7 +365,7 @@ mod test {
         // update the value of node C
         tree.put("C".into(), 42);
 
-        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 8);
+        assert_eq!(tree.root.as_ref().unwrap().borrow().n, 10);
     }
 
     #[test]
@@ -436,6 +436,8 @@ mod test {
     fn test_select() {
         let tree = make_tree();
         tree.show();
+
+        // select (3)
     }
 
     fn make_tree() -> BalancedTree<String, u32> {
@@ -444,24 +446,29 @@ mod test {
         // The numbers in brackets indicate the number of nodes in the subtree
         //
         //                     +-------+
-        //                     | S (8) |
+        //                     | S(10) |
         //                     +-------+
         //                    /         \
         //            +-------+          +-------+
-        //            |  E(6) |          |  X (1)|
+        //            |  E(8) |          |  X (1)|
         //            +-------+          +-------+
         //           /         \
         //  +-------+          +-------+
-        //  | A (2) |          | R (3) |
+        //  | A (2) |          | R (5) |
         //  +-------+          +-------+
         // /         \        /      
         //      +-------+    +-------+
-        //      | C (1) |    |  H (2)|
+        //      | C (1) |    |  H (4)|
         //      +-------+    +-------+
         //                            \
         //                             +-------+
-        //                             | M (1) |
+        //                             | M (3) |
         //                             +-------+
+        //                            /         \
+        //                   +-------+           +-------+
+        //                   | L (1) |           | P (1) |
+        //                   +-------+           +-------+
+        //
         tree.put("S".into(), 0);
         tree.put("X".into(), 0);
         tree.put("E".into(), 0);
@@ -470,6 +477,8 @@ mod test {
         tree.put("R".into(), 0);
         tree.put("H".into(), 0);
         tree.put("M".into(), 0);
+        tree.put("L".into(), 0);
+        tree.put("P".into(), 0);
         
         tree
     }
