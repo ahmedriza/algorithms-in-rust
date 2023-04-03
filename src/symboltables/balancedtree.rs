@@ -75,22 +75,22 @@ where
     /// left subtree; if not (or if key is equal to the key at the root), then the key at the root
     /// is the ceil of the key.    
     pub fn ceiling(&self, key: K) -> Option<K> {
-        BalancedTree::ceil_r(&self.root, key)
+        BalancedTree::ceiling_r(&self.root, key)
     }
 
-    fn ceil_r(link: &Link<K, V>, key: K) -> Option<K> {
+    fn ceiling_r(link: &Link<K, V>, key: K) -> Option<K> {
         match link {
             Some(node) => {
                 match key.cmp(&node.borrow().key) {
                     Ordering::Less => {
-                        let t = BalancedTree::ceil_r(&node.borrow().left, key);
+                        let t = BalancedTree::ceiling_r(&node.borrow().left, key);
                         match t {
                             s @ Some(_) => s,
                             None => Some(node.borrow().key.clone())
                         }
                     }
                     Ordering::Equal => Some(node.borrow().key.clone()),
-                    Ordering::Greater => BalancedTree::ceil_r(&node.borrow().right, key),
+                    Ordering::Greater => BalancedTree::ceiling_r(&node.borrow().right, key),
                 }
             }
             None => None,
@@ -361,7 +361,35 @@ mod test {
         tree.put("M".into(), 0);
 
         assert_eq!(tree.floor("G".to_string()), Some("E".to_string()));
-    } 
+    }
+
+    #[test]
+    fn test_ceil() {
+        let mut tree = BalancedTree::<String, u32>::new();
+
+        //         S
+        //        /  \
+        //       E    X
+        //      /  \
+        //     A    R
+        //    / \   / \
+        //       C H
+        //        / \
+        //            M
+        // 
+        tree.put("S".into(), 0);
+        tree.put("E".into(), 0);
+        tree.put("X".into(), 0);
+        tree.put("R".into(), 0);
+        tree.put("A".into(), 0);
+        tree.put("C".into(), 0);
+        tree.put("H".into(), 0);
+        tree.put("M".into(), 0);
+
+        assert_eq!(tree.ceiling("T".to_string()), Some("X".into()));
+        assert_eq!(tree.ceiling("D".to_string()), Some("E".into()));
+        assert_eq!(tree.ceiling("G".to_string()), Some("H".into()));
+    }     
 
     fn make_tree() -> BalancedTree<String, u32> {
         let mut tree = BalancedTree::<String, u32>::new();
